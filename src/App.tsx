@@ -1,0 +1,145 @@
+import { useState } from "react";
+
+type Despesa = {
+  descricao: string;
+  valor: number;
+};
+
+type Receita = {
+  descricao: string;
+  valor: number;
+};
+
+export default function App() {
+  const [despesas, setDespesas] = useState<Despesa[]>([]);
+  const [receitas, setReceitas] = useState<Receita[]>([]);
+  const [saldo, setSaldo] = useState(0);
+
+  const [desc, setDesc] = useState("");
+  const [valor, setValor] = useState(0);
+  const [tipo, setTipo] = useState<"receita" | "despesa">("receita");
+
+  const adicionar = () => {
+    if (!desc.trim()) {
+      window.alert("Por favor, preencha a descrição.");
+      return;
+    }
+
+    if (valor <= 0 || isNaN(valor)) {
+      window.alert("Por favor, informe um valor válido maior que zero.");
+      return;
+    }
+
+    if (tipo === "despesa") {
+      const novaDespesa: Despesa = { descricao: desc, valor };
+      setDespesas([...despesas, novaDespesa]);
+      setSaldo((prev) => prev - valor);
+    } else {
+      const novaReceita: Receita = { descricao: desc, valor };
+      setReceitas([...receitas, novaReceita]);
+      setSaldo((prev) => prev + valor);
+    }
+
+    setDesc("");
+    setValor(0);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-300 flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6">
+        <h1 className="text-3xl font-bold mb-6 text-center text-slate-800">
+          Controle Financeiro
+        </h1>
+
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <input
+            type="text"
+            placeholder="Descrição"
+            className="flex-1 border border-slate-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="Valor"
+            className="w-32 border border-slate-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+            value={valor === 0 ? "" : valor}
+            onChange={(e) => {
+              const v = Number(e.target.value);
+              setValor(isNaN(v) ? 0 : v);
+            }}
+          />
+          <select
+            className="border border-slate-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+            value={tipo}
+            onChange={(e) => setTipo(e.target.value as "receita" | "despesa")}
+          >
+            <option value="receita">Receita</option>
+            <option value="despesa">Despesa</option>
+          </select>
+          <button
+            onClick={adicionar}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
+          >
+            Adicionar
+          </button>
+        </div>
+
+        <div className="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-200">
+          <h2 className="text-2xl font-semibold text-center">
+            Saldo:{" "}
+            <span className={saldo >= 0 ? "text-green-600" : "text-red-600"}>
+              R$ {saldo.toFixed(2)}
+            </span>
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-2 text-red-600">
+              Despesas
+            </h3>
+            <ul className="space-y-2">
+              {despesas.map((despesa, index) => (
+                <li
+                  key={index}
+                  className="flex justify-between items-center bg-red-50 border border-red-200 px-4 py-2 rounded-lg"
+                >
+                  <span>{despesa.descricao}</span>
+                  <span>R$ {despesa.valor.toFixed(2)}</span>
+                </li>
+              ))}
+              {despesas.length === 0 && (
+                <p className="text-sm text-slate-500">Nenhuma despesa</p>
+              )}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2 text-green-600">
+              Receitas
+            </h3>
+            <ul className="space-y-2">
+              {receitas.map((receita, index) => (
+                <li
+                  key={index}
+                  className="flex justify-between items-center bg-green-50 border border-green-200 px-4 py-2 rounded-lg"
+                >
+                  <span>{receita.descricao}</span>
+                  <span>R$ {receita.valor.toFixed(2)}</span>
+                </li>
+              ))}
+              {receitas.length === 0 && (
+                <p className="text-sm text-slate-500">Nenhuma receita</p>
+              )}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="fixed bottom-2 right-4 text-slate-500 text-xs">
+        GestorFinanceiroApp
+      </div>
+    </div>
+  );
+}
