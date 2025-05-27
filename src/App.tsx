@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Despesa = {
   descricao: string;
@@ -11,9 +11,20 @@ type Receita = {
 };
 
 export default function App() {
-  const [despesas, setDespesas] = useState<Despesa[]>([]);
-  const [receitas, setReceitas] = useState<Receita[]>([]);
-  const [saldo, setSaldo] = useState(0);
+  const [despesas, setDespesas] = useState<Despesa[]>(() => {
+    const saved = localStorage.getItem("despesas");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [receitas, setReceitas] = useState<Receita[]>(() => {
+    const saved = localStorage.getItem("receitas");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [saldo, setSaldo] = useState(() => {
+    const saved = localStorage.getItem("saldo");
+    return saved ? Number(saved) : 0;
+  });
 
   const [desc, setDesc] = useState("");
   const [valor, setValor] = useState(0);
@@ -32,17 +43,25 @@ export default function App() {
 
     if (tipo === "despesa") {
       const novaDespesa: Despesa = { descricao: desc, valor };
-      setDespesas([...despesas, novaDespesa]);
+      const novasDespesas = [...despesas, novaDespesa];
+      setDespesas(novasDespesas);
       setSaldo((prev) => prev - valor);
     } else {
       const novaReceita: Receita = { descricao: desc, valor };
-      setReceitas([...receitas, novaReceita]);
+      const novasReceitas = [...receitas, novaReceita];
+      setReceitas(novasReceitas);
       setSaldo((prev) => prev + valor);
     }
 
     setDesc("");
     setValor(0);
   };
+
+  useEffect(() => {
+    localStorage.setItem("despesas", JSON.stringify(despesas));
+    localStorage.setItem("receitas", JSON.stringify(receitas));
+    localStorage.setItem("saldo", saldo.toString());
+  }, [despesas, receitas, saldo]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-300 flex items-center justify-center p-4">
