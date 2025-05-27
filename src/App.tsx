@@ -57,6 +57,30 @@ export default function App() {
     setValor(0);
   };
 
+  const removerDespesa = (index: number) => {
+    const despesa = despesas[index];
+    const novasDespesas = despesas.filter((_, i) => i !== index);
+    setDespesas(novasDespesas);
+    setSaldo((prev) => prev + despesa.valor);
+  };
+
+  const removerReceita = (index: number) => {
+    const receita = receitas[index];
+    const novasReceitas = receitas.filter((_, i) => i !== index);
+    setReceitas(novasReceitas);
+    setSaldo((prev) => prev - receita.valor);
+  };
+
+  const limparTudo = () => {
+    const confirmar = window.confirm("Tem certeza que deseja limpar tudo?");
+    if (confirmar) {
+      setDespesas([]);
+      setReceitas([]);
+      setSaldo(0);
+      localStorage.clear();
+    }
+  };
+
   useEffect(() => {
     localStorage.setItem("despesas", JSON.stringify(despesas));
     localStorage.setItem("receitas", JSON.stringify(receitas));
@@ -104,13 +128,19 @@ export default function App() {
           </button>
         </div>
 
-        <div className="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-200">
-          <h2 className="text-2xl font-semibold text-center">
+        <div className="flex justify-between items-center bg-slate-50 rounded-lg p-4 mb-6 border border-slate-200">
+          <h2 className="text-2xl font-semibold">
             Saldo:{" "}
             <span className={saldo >= 0 ? "text-green-600" : "text-red-600"}>
               R$ {saldo.toFixed(2)}
             </span>
           </h2>
+          <button
+            onClick={limparTudo}
+            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm"
+          >
+            Limpar Tudo
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -124,8 +154,15 @@ export default function App() {
                   key={index}
                   className="flex justify-between items-center bg-red-50 border border-red-200 px-4 py-2 rounded-lg"
                 >
-                  <span>{despesa.descricao}</span>
-                  <span>R$ {despesa.valor.toFixed(2)}</span>
+                  <div>
+                    {despesa.descricao} - R$ {despesa.valor.toFixed(2)}
+                  </div>
+                  <button
+                    onClick={() => removerDespesa(index)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    ✕
+                  </button>
                 </li>
               ))}
               {despesas.length === 0 && (
@@ -144,8 +181,15 @@ export default function App() {
                   key={index}
                   className="flex justify-between items-center bg-green-50 border border-green-200 px-4 py-2 rounded-lg"
                 >
-                  <span>{receita.descricao}</span>
-                  <span>R$ {receita.valor.toFixed(2)}</span>
+                  <div>
+                    {receita.descricao} - R$ {receita.valor.toFixed(2)}
+                  </div>
+                  <button
+                    onClick={() => removerReceita(index)}
+                    className="text-green-600 hover:text-green-800"
+                  >
+                    ✕
+                  </button>
                 </li>
               ))}
               {receitas.length === 0 && (
