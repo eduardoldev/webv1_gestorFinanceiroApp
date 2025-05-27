@@ -9,6 +9,7 @@ GestorFinanceiroApp é uma aplicação web simples para controle financeiro pess
 - Listagem separada de receitas e despesas
 - Validação de campos para evitar lançamentos inválidos
 - Interface responsiva e moderna
+- **Salvamento automático dos dados no navegador (localStorage), garantindo que seus lançamentos não sejam perdidos ao atualizar ou fechar a página**
 
 ## Tecnologias Utilizadas
 
